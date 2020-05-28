@@ -26,8 +26,10 @@ public class AlarmManagerDialog extends Dialog implements View.OnClickListener, 
     Activity activity;
     Button btnTime, btnOK, btnCancel;
     LinearLayout layoutWeekday;
-    ToggleButton sunday, monday, tuesday, wednesday, thursday,friday, saturday;
+    ToggleButton[] weekdays;
     CheckBox checkRepeat;
+
+    int mHourOfDay, mMinute;
 
     public AlarmManagerDialog(Activity activity) {
 
@@ -66,13 +68,14 @@ public class AlarmManagerDialog extends Dialog implements View.OnClickListener, 
 
         layoutWeekday = (LinearLayout) findViewById(R.id.layoutWeekday);
 
-        sunday      = (ToggleButton) findViewById(R.id.sunday);
-        monday      = (ToggleButton) findViewById(R.id.monday);
-        tuesday     = (ToggleButton) findViewById(R.id.tuesday);
-        wednesday   = (ToggleButton) findViewById(R.id.wednesday);
-        thursday    = (ToggleButton) findViewById(R.id.thursday);
-        friday      = (ToggleButton) findViewById(R.id.friday);
-        saturday    = (ToggleButton) findViewById(R.id.saturday);
+        weekdays = new ToggleButton[7];
+        weekdays[0]     = (ToggleButton) findViewById(R.id.sunday);
+        weekdays[1]     = (ToggleButton) findViewById(R.id.monday);
+        weekdays[2]     = (ToggleButton) findViewById(R.id.tuesday);
+        weekdays[3]     = (ToggleButton) findViewById(R.id.wednesday);
+        weekdays[4]     = (ToggleButton) findViewById(R.id.thursday);
+        weekdays[5]     = (ToggleButton) findViewById(R.id.friday);
+        weekdays[6]     = (ToggleButton) findViewById(R.id.saturday);
 
         init();
     }
@@ -91,6 +94,8 @@ public class AlarmManagerDialog extends Dialog implements View.OnClickListener, 
         ss1.setSpan(new RelativeSizeSpan(2f), 0,2, 0); // set size*/
 
         btnTime.setText( hourOfDay + ":" + String.format("%02d", minute));
+        this.mHourOfDay = hourOfDay;
+        this.mMinute = minute;
     }
 
     @Override
@@ -102,19 +107,16 @@ public class AlarmManagerDialog extends Dialog implements View.OnClickListener, 
             case R.id.btnTime:
 
                 // TODO Auto-generated method stub
-                Calendar mcurrentTime = Calendar.getInstance();
-                int hour = mcurrentTime.get(Calendar.HOUR_OF_DAY);
-                int minute = mcurrentTime.get(Calendar.MINUTE);
 
                 TimePickerDialog mTimePicker;
-
-                mTimePicker = new TimePickerDialog(activity, this, hour, minute, true);//Yes 24 hour time
+                mTimePicker = new TimePickerDialog(activity, this, mHourOfDay, mMinute, true);//Yes 24 hour time
 
                 mTimePicker.setTitle("Select Time");
                 mTimePicker.show();
                 break;
 
             case R.id.checkRepeat :
+
                 if(checkRepeat.isChecked()){
                     layoutWeekday.setVisibility(View.VISIBLE);
                 }else{
@@ -127,10 +129,26 @@ public class AlarmManagerDialog extends Dialog implements View.OnClickListener, 
                 AlarmManager alarmMgr = (AlarmManager)activity.getSystemService(Context.ALARM_SERVICE);
                 Intent intent = new Intent(activity, MyAlarmReceiver.class);
                 PendingIntent pendingIntent = PendingIntent.getBroadcast(activity, 0, intent, 0);
-                Calendar time = Calendar.getInstance();
-                time.setTimeInMillis(System.currentTimeMillis());
-                time.add(Calendar.SECOND, 5);
-                alarmMgr.set(AlarmManager.RTC_WAKEUP, time.getTimeInMillis(), pendingIntent);
+
+                Calendar alarmCalendar = Calendar.getInstance();
+                alarmCalendar.set(Calendar.HOUR_OF_DAY, mHourOfDay);
+                alarmCalendar.set(Calendar.MINUTE, mMinute);
+                alarmCalendar.set(Calendar.SECOND, 0);
+                alarmCalendar.set(Calendar.MILLISECOND, 0);
+
+
+                if(!checkRepeat.isChecked()){
+                    alarmMgr.set(AlarmManager.RTC_WAKEUP, alarmCalendar.getTimeInMillis(), pendingIntent);
+                }else{
+
+                    for(int i = 0; i < 7; i++){
+
+                        alarmCalendar.set(Calendar.DAY_OF_WEEK, i + 1);
+                        alarmMgr.setRepeating(AlarmManager.RTC_WAKEUP,
+                                alarmCalendar.getTimeInMillis(), 24 * 60 * 60 * 1000, pendingIntent);
+                    }
+                }
+
 
                 dismiss();
                 break;
