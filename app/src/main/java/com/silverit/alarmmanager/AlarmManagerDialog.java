@@ -7,6 +7,7 @@ import android.app.PendingIntent;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.icu.util.Calendar;
@@ -16,20 +17,24 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.ToggleButton;
 
 
 public class AlarmManagerDialog extends Dialog implements View.OnClickListener, TimePickerDialog.OnTimeSetListener {
 
-    Activity activity;
-    Button btnTime, btnOK, btnCancel;
-    LinearLayout layoutWeekday;
-    ToggleButton[] weekdays;
-    CheckBox checkRepeat;
+    private Activity activity;
+    private Button btnTime, btnOK, btnCancel;
+    private LinearLayout layoutWeekday;
+    private ToggleButton[] weekdays;
+    private CheckBox checkRepeat;
+    private TextView textVoiceName;
+    private EditText editPlayCount;
 
-    int mHourOfDay, mMinute;
+    private int mHourOfDay, mMinute;
 
     public AlarmManagerDialog(Activity activity) {
 
@@ -53,11 +58,14 @@ public class AlarmManagerDialog extends Dialog implements View.OnClickListener, 
         getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
 
-        btnTime = (Button) findViewById(R.id.btnTime);
 
-        checkRepeat = (CheckBox) findViewById(R.id.checkRepeat);
-        btnOK = (Button) findViewById(R.id.btnOK);
-        btnCancel = (Button) findViewById(R.id.btnCancel);
+        checkRepeat         = (CheckBox) findViewById(R.id.checkRepeat);
+        textVoiceName       = (TextView) findViewById(R.id.textVoiceName);
+        editPlayCount       = (EditText) findViewById(R.id.editPlays);
+
+        btnTime             = (Button) findViewById(R.id.btnTime);
+        btnOK               = (Button) findViewById(R.id.btnOK);
+        btnCancel           = (Button) findViewById(R.id.btnCancel);
 
 
         btnTime.setOnClickListener(this);
@@ -149,6 +157,10 @@ public class AlarmManagerDialog extends Dialog implements View.OnClickListener, 
                     }
                 }
 
+
+                SharedPreferences.Editor editor = activity.getSharedPreferences("juke1", Context.MODE_PRIVATE).edit();
+                editor.putString(textVoiceName.getText().toString(), editPlayCount.getText().toString());
+                editor.commit();
 
                 dismiss();
                 break;
