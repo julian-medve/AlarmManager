@@ -16,7 +16,7 @@ import androidx.core.app.NotificationCompat;
 
 import java.util.Calendar;
 
-public class MyAlarmReceiver extends BroadcastReceiver {
+public class AlarmReceiver extends BroadcastReceiver {
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
@@ -40,8 +40,8 @@ public class MyAlarmReceiver extends BroadcastReceiver {
         String voice_name = intent.getStringExtra("voice_name");
         Boolean isPlayable = intent.getBooleanExtra("playable", false);
 
-        Intent deleteIntent = new Intent(context, MyAlarmReceiver.class);
-        deleteIntent.setAction("Action");
+        Intent deleteIntent = new Intent(context, NotificationReceiver.class);
+        deleteIntent.setAction("notification");
         deleteIntent.putExtra("voice_name", voice_name);
         deleteIntent.putExtra("playable", isPlayable);
 

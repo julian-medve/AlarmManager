@@ -7,7 +7,6 @@ import android.app.PendingIntent;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.icu.util.Calendar;
@@ -23,8 +22,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.ToggleButton;
-
-import java.util.Date;
 
 
 public class AlarmManagerDialog extends Dialog implements View.OnClickListener, TimePickerDialog.OnTimeSetListener {
@@ -152,7 +149,7 @@ public class AlarmManagerDialog extends Dialog implements View.OnClickListener, 
 
                 AlarmManager alarmMgr = (AlarmManager)activity.getSystemService(Context.ALARM_SERVICE);
 
-                Intent intent = new Intent(activity, MyAlarmReceiver.class);
+                Intent intent = new Intent(activity, AlarmReceiver.class);
                 intent.putExtra("voice_name", textVoiceName.getText().toString());
                 intent.putExtra("playable",  checkPlay.isChecked());
 
@@ -181,6 +178,8 @@ public class AlarmManagerDialog extends Dialog implements View.OnClickListener, 
 
                             alarmMgr.setRepeating(AlarmManager.RTC_WAKEUP,
                                     alarmCalendar.getTimeInMillis(),  alarmMgr.INTERVAL_DAY * 7, pendingIntent);
+
+                            Log.d("AlarmManager", alarmCalendar.getTimeInMillis() + "");
                         }
                     }
                 }
